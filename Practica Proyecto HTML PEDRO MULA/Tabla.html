@@ -8,6 +8,8 @@
 <body>
     <h1>Lista de Sensores</h1>
 
+    <input type="text" id="filtro" placeholder="Buscar por nombre o descripción">
+
     <table border="1">
         <thead>
             <tr>
@@ -16,16 +18,10 @@
                 <th>Número de Serie</th>
                 <th>Estado</th>
                 <th>Prioridad</th>
+                <th>Acciones</th>
             </tr>
         </thead>
-        <tbody>
-            <tr>
-                <td>Sensor 1</td>
-                <td>Descripción del Sensor 1</td>
-                <td>12345</td>
-                <td>Activo</td>
-                <td>Alta</td>
-            </tr>
+        <tbody id="tablaSensores">
             
         </tbody>
     </table>
@@ -37,5 +33,7 @@
         <li><a href="detalles.html">Ver Detalles del Proyecto</a></li>
         <li><a href="contacto.html">Contacto</a></li>
     </ul>
+
+    <script src="js/script.js"></script>
 </body>
 </html>
