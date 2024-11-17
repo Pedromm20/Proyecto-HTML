@@ -1,69 +1,47 @@
 <?php
+class Element {
+    private $db;
 
-require_once __DIR__ . '/../interfaces/IToJson.php';
-
-
-class Element implements IToJson {
-
-    private $nombre;
-    private $descripcion;
-    private $numSerie;
-    private $estado;
-    private $prioridad;
-
-    public function __construct($nombre, $descripcion, $numSerie, $estado, $prioridad) {
-        $this->nombre = $nombre;
-        $this->descripcion = $descripcion;
-        $this->numSerie = $numSerie;
-        $this->estado = $estado;
-        $this->prioridad = $prioridad;
-    }
-    // getters y setters 
-    public function getNombre() {
-        return $this->nombre;
-    }
-    public function setNombre($nombre) {
-        $this->nombre = $nombre;
-    }
-    public function getDescripcion() {
-        return $this->descripcion;
-    }
-    public function setDescripcion($descripcion) {
-        $this->descripcion = $descripcion;
-    }
-    public function getNumSerie() {
-        return $this->numSerie;
-    }
-    public function setNumSerie($numSerie) {
-        $this->numSerie = $numSerie;
+    public function __construct($db) {
+        $this->db = $db;
     }
 
-    public function getEstado() {
-        return $this->estado;
+    public function create($data) {
+        $query = "INSERT INTO elementos (nombre, descripcion, nserie, estado, prioridad) 
+                  VALUES (:nombre, :descripcion, :nserie, :estado, :prioridad)";
+        $stmt = $this->db->prepare($query);
+    
+        $stmt->bindValue(':nombre', $data['nombre'] ?? '');
+        $stmt->bindValue(':descripcion', $data['descripcion'] ?? '');
+        $stmt->bindValue(':nserie', $data['nserie'] ?? '');
+        $stmt->bindValue(':estado', $data['estado'] ?? '');
+        $stmt->bindValue(':prioridad', $data['prioridad'] ?? '');
+    
+        return $stmt->execute();
     }
-    public function setEstado($estado) {
-        $this->estado = $estado;
-    }
-    public function getPrioridad() {
-        return $this->prioridad;
-    }
-    public function setPrioridad($prioridad) {
-        $this->prioridad = $prioridad;
+    
+
+    public function update($id, $data) {
+        $query = "UPDATE elementos SET nombre = :nombre, descripcion = :descripcion, nserie = :nserie, 
+            estado = :estado, prioridad = :prioridad WHERE id = :id";
+        $data['id'] = $id;
+        $stmt = $this->db->prepare($query);
+        return $stmt->execute($data);
     }
 
-    // metodo 
+    public function delete($id) {
+        $stmt = $this->db->prepare("DELETE FROM elementos WHERE id = :id");
+        return $stmt->execute(['id' => $id]);
+    }
 
-    public function toJSON() {
-        return json_encode(
-            array(
-                'nombre' => $this->nombre,
-                'descripcion' => $this->descripcion,
-                'numSerie' => $this->numSerie,
-                'estado' => $this->estado,
-                'prioridad' => $this->prioridad
-            )
-            
-            );
-            }
-        
+    public function getById($id) {
+        $stmt = $this->db->prepare("SELECT * FROM elementos WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getAll() {
+        $stmt = $this->db->query("SELECT * FROM elementos");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

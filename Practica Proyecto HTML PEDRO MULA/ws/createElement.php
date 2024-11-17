@@ -1,41 +1,13 @@
 <?php
+require_once 'Connection.php';
+require_once __DIR__ . '/models/Element.php';
 
-require_once 'models/Element.php';
+$db = Connection::connect();
+$element = new Element($db);
+$data = json_decode(file_get_contents('php://input'), true);
 
+$response = $element->create($data)
+    ? ["success" => true, "message" => "Elemento creado"]
+    : ["success" => false, "message" => "Error al crear el elemento"];
 
-class Main
-{
-
-    public function run()
-    {
-        $nombre = $_POST['nombre'] ?? null;
-        $descripcion = $_POST['descripcion'] ?? null;
-        $numSerie = $_POST['numSerie'] ?? null;
-        $estado = $_POST['estado'] ?? null;
-        $prioridad = $_POST['prioridad'] ?? null;
-
-        if (empty($nombre) || empty($descripcion) || empty($numSerie) || empty($estado) || empty($prioridad)) {
-            return "No se han recibido todos los datos";
-        }
-        $element = new Element($nombre, $descripcion, $numSerie, $estado, $prioridad);
-
-        $this->guardarElemento($element->toJSON());
-
-        return $element->toJSON();
-    }
-
-
-    private function guardarElemento($data)
-    {
-        $file = 'elements.txt';
-
-        $file_handle = fopen($file, 'a');
-        fwrite($file_handle, $data . PHP_EOL);
-        fclose($file_handle);
-    }
-}
-$main = new Main();
-
-echo $main->run();
-
-
+echo json_encode($response);

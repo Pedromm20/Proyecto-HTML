@@ -1,2 +1,3 @@
 {"nombre":"Radar123","descripcion":"aaaaaaaaaaa","numSerie":"1234","estado":"activo","prioridad":"alta"}
 {"nombre":"apple","descripcion":"es un producto muy caro","numSerie":"67890","estado":"inactivo","prioridad":"baja"}
+{"nombre":"Radar123","descripcion":"radar bonito","numSerie":"12345","estado":"activo","prioridad":"media"}

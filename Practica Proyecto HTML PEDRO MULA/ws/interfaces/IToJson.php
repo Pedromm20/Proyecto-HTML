@@ -1,6 +1,6 @@
 <?php
 
 interface IToJson {
-    public function toJson();
+    public function toJSON();
 
 }
