@@ -1,4 +1,4 @@
-const sensores = [
+let sensores = [
   {
     nombre: "Safecurity",
     descripcion: "Apto para detectar intrusos",
@@ -15,21 +15,21 @@ const sensores = [
   },
   {
     nombre: "Gaslight",
-    descripcion: "Detecta gases toxicos",
+    descripcion: "Detecta gases tóxicos",
     numeroSerie: "23456",
     estado: true,
     prioridad: "media",
   },
   {
     nombre: "Prelightlight",
-    descripcion: "Detecta gases poco toxicos",
+    descripcion: "Detecta gases poco tóxicos",
     numeroSerie: "34567",
     estado: true,
     prioridad: "alta",
   },
   {
     nombre: "Gasttier",
-    descripcion: "Detecta gases poco toxicos y es bonito",
+    descripcion: "Detecta gases poco tóxicos y es bonito",
     numeroSerie: "45678",
     estado: true,
     prioridad: "media",
@@ -40,7 +40,7 @@ function cargarTabla() {
   const tablaSensores = document.getElementById("tablaSensores");
   tablaSensores.innerHTML = "";
 
-  sensores.forEach((sensor) => {
+  sensores.forEach((sensor, index) => {
     const fila = document.createElement("tr");
 
     const nombre = document.createElement("td");
@@ -64,8 +64,16 @@ function cargarTabla() {
     btnEliminar.className = "btnEliminar";
 
     btnEliminar.onclick = () => {
-      fila.remove();
+      sensores.splice(index, 1);
+      cargarTabla();
     };
+
+    const btnModificar = document.createElement("button");
+    btnModificar.textContent = "Editar";
+    btnModificar.onclick = () => mostrarFormulario(sensor);
+
+    acciones.appendChild(btnEliminar);
+    acciones.appendChild(btnModificar);
 
     fila.appendChild(nombre);
     fila.appendChild(descripcion);
@@ -73,10 +81,32 @@ function cargarTabla() {
     fila.appendChild(estado);
     fila.appendChild(prioridad);
     fila.appendChild(acciones);
-    acciones.appendChild(btnEliminar);
 
     tablaSensores.appendChild(fila);
   });
+}
+
+function mostrarFormulario(sensor) {
+  document.getElementById("formularioEdicion").style.display = "block";
+
+  document.getElementById("nombreEdicion").value = sensor.nombre;
+  document.getElementById("descripcionEdicion").value = sensor.descripcion;
+  document.getElementById("numSerieEdicion").value = sensor.numeroSerie;
+  document.getElementById("estadoEdicion").value = sensor.estado ? "true" : "false";
+  document.getElementById("prioridadEdicion").value = sensor.prioridad;
+
+  document.getElementById("guardarEdicion").onclick = () => guardarEdicion(sensor);
+}
+
+function guardarEdicion(sensor) {
+  sensor.nombre = document.getElementById("nombreEdicion").value;
+  sensor.descripcion = document.getElementById("descripcionEdicion").value;
+  sensor.numeroSerie = document.getElementById("numSerieEdicion").value;
+  sensor.estado = document.getElementById("estadoEdicion").value === "true";
+  sensor.prioridad = document.getElementById("prioridadEdicion").value;
+
+  cargarTabla();
+  document.getElementById("formularioEdicion").style.display = "none";
 }
 
 function filtrarSensores() {

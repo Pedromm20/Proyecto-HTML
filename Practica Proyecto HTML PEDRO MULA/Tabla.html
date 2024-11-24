@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tabla de Sensores</title>
+    <script src="js/script.js" defer></script>
+    <link rel="stylesheet" href="css/styles.css">
+
+    
+
 </head>
 <body>
     <h1>Lista de Sensores</h1>
@@ -25,15 +30,29 @@
             
         </tbody>
     </table>
+    <!-- Formulario de edición -->
+  <div id="formularioEdicion" style="display: none;">
+    <h3>Editar Sensor</h3>
+    <form id="formEdicion">
+      <label>Nombre:</label><input type="text" id="nombreEdicion"><br>
+      <label>Descripción:</label><input type="text" id="descripcionEdicion"><br>
+      <label>Número de Serie:</label><input type="text" id="numSerieEdicion"><br>
+      <label>Estado:</label>
+      <select id="estadoEdicion">
+        <option value="true">Activo</option>
+        <option value="false">Inactivo</option>
+      </select><br>
+      <label>Prioridad:</label>
+      <select id="prioridadEdicion">
+        <option value="alta">Alta</option>
+        <option value="media">Media</option>
+        <option value="baja">Baja</option>
+      </select><br>
+      <button type="button" id="guardarEdicion">Guardar</button>
+    </form>
+  </div>
 
-    <h3>Enlaces a otras páginas</h3>
-    <ul>
-        <li><a href="formulario.html">Formulario de Registro</a></li>
-        <li><a href="condiciones_alertas.html">Condiciones y Alertas</a></li>
-        <li><a href="detalles.html">Ver Detalles del Proyecto</a></li>
-        <li><a href="contacto.html">Contacto</a></li>
-    </ul>
+    <script src="js/nav.js"></script>
 
-    <script src="js/script.js"></script>
 </body>
 </html>
