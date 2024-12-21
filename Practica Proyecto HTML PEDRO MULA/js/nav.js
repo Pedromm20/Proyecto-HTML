@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((data) => {
         document.body.insertAdjacentHTML("afterbegin", data);
   
-        const currentPath = window.location.pathname.split("/").pop();
+        const currentPath = window.location.pathname.split("/").pop(); // 
         const navLinks = document.querySelectorAll("nav a");
   
         navLinks.forEach((link) => {

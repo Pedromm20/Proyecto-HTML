@@ -4,26 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario de Sensor</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script defer src="js/script.js"></script>
 </head>
 <body>
     <h1>Formulario de Registro de Sensor</h1>
 
-    <form action="ws/createElement.php" method="POST">
+    <form id="formSensor">
         <label for="nombre">Nombre del Elemento:</label>
         <input type="text" id="nombre" name="nombre" required><br><br>
-    
+
         <label for="descripcion">Descripción del Elemento:</label>
         <textarea id="descripcion" name="descripcion" rows="4" cols="50" required></textarea><br><br>
-    
-        <label for="numSerie">Número de Serie:</label>
-        <input type="number" id="numSerie" name="numSerie" required><br><br>
-    
-        <label for="estado_activo">Estado:</label>
-        <input type="radio" id="estado_activo" name="estado" value="activo" required> Activo<br>
-    
-        <label for="estado_inactivo">Estado:</label>
-        <input type="radio" id="estado_inactivo" name="estado" value="inactivo" required> Inactivo<br><br>
-    
+
+        <label for="numero_serie">Número de Serie:</label>
+        <input type="text" id="numero_serie" name="numero_serie" required><br><br>
+
+        <label for="estado">Estado:</label>
+        <input type="checkbox" id="estado" name="estado"> Activo<br><br>
+        
+        <input type="radio" id="inactivo" name="estado" value="inactivo" required>
+        <label for="inactivo">Inactivo</label><br><br>
+
         <label for="prioridad">Prioridad:</label><br>
         <input type="radio" id="alta" name="prioridad" value="alta" required>
         <label for="alta">Alta</label><br>
@@ -31,17 +34,31 @@
         <label for="media">Media</label><br>
         <input type="radio" id="baja" name="prioridad" value="baja" required>
         <label for="baja">Baja</label><br><br>
-    
-        <input type="submit" value="Enviar">
-    </form>
-    
 
-    <h3>Enlaces a otras páginas</h3>
-    <ul>
-        <li><a href="tabla.html">Ver Tabla de Sensores</a></li>
-        <li><a href="condiciones_alertas.html">Condiciones y Alertas</a></li>
-        <li><a href="detalles.html">Ver Detalles del Proyecto</a></li>
-        <li><a href="contacto.html">Contacto</a></li>
-    </ul>
+        <button type="button" onclick="crearElemento()"> Crear Elemento</button>
+    </form>
+
+    <div id="formularioEdicion" style="display:none;">
+        <h3>Editar Sensor</h3>
+        <form id="formEdicion">
+            <label>Nombre:</label><input type="text" id="nombreEdicion"><br>
+            <label>Descripción:</label><input type="text" id="descripcionEdicion"><br>
+            <label>Número de Serie:</label><input type="text" id="numSerieEdicion"><br>
+            <label>Estado:</label>
+            <select id="estadoEdicion">
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+            </select><br>
+            <label>Prioridad:</label>
+            <select id="prioridadEdicion">
+                <option value="alta">Alta</option>
+                <option value="media">Media</option>
+                <option value="baja">Baja</option>
+            </select><br>
+            <button type="button" id="guardarEdicion">Guardar</button>
+        </form>
+    </div>
+    
+    <script src="js/nav.js"></script>
 </body>
 </html>

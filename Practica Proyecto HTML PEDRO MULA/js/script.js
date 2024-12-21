@@ -1,112 +1,65 @@
-let sensores = [
-  {
-    nombre: "Safecurity",
-    descripcion: "Apto para detectar intrusos",
-    numeroSerie: "12345",
-    estado: true,
-    prioridad: "alta",
-  },
-  {
-    nombre: "Prettier",
-    descripcion: "Muy bonito y barato",
-    numeroSerie: "67890",
-    estado: false,
-    prioridad: "baja",
-  },
-  {
-    nombre: "Gaslight",
-    descripcion: "Detecta gases tóxicos",
-    numeroSerie: "23456",
-    estado: true,
-    prioridad: "media",
-  },
-  {
-    nombre: "Prelightlight",
-    descripcion: "Detecta gases poco tóxicos",
-    numeroSerie: "34567",
-    estado: true,
-    prioridad: "alta",
-  },
-  {
-    nombre: "Gasttier",
-    descripcion: "Detecta gases poco tóxicos y es bonito",
-    numeroSerie: "45678",
-    estado: true,
-    prioridad: "media",
-  },
-];
-
 function cargarTabla() {
   const tablaSensores = document.getElementById("tablaSensores");
-  tablaSensores.innerHTML = "";
+  tablaSensores.innerHTML = ""; 
 
-  sensores.forEach((sensor, index) => {
-    const fila = document.createElement("tr");
+  fetch("ws/getElements.php") 
+    .then((response) => response.json()) 
+    .then((data) => {
+      console.log(data); 
+      if (data.error) {
+        Swal.fire("Error", data.error, "error");
+        return;
+      }
+      data.forEach((sensor, index) => {
+        const fila = document.createElement("tr");
 
-    const nombre = document.createElement("td");
-    nombre.textContent = sensor.nombre;
+        const nombre = document.createElement("td");
+        nombre.textContent = sensor.nombre;
 
-    const descripcion = document.createElement("td");
-    descripcion.textContent = sensor.descripcion;
+        const descripcion = document.createElement("td");
+        descripcion.textContent = sensor.descripcion;
 
-    const numeroSerie = document.createElement("td");
-    numeroSerie.textContent = sensor.numeroSerie;
+        const numeroSerie = document.createElement("td");
+        numeroSerie.textContent = sensor.nserie;
 
-    const estado = document.createElement("td");
-    estado.textContent = sensor.estado ? "Activo" : "Inactivo";
+        const estado = document.createElement("td");
+        estado.textContent = sensor.estado === "activo" ? "Activo" : "Inactivo";
 
-    const prioridad = document.createElement("td");
-    prioridad.textContent = sensor.prioridad;
+        const prioridad = document.createElement("td");
+        prioridad.textContent = sensor.prioridad;
 
-    const acciones = document.createElement("td");
-    const btnEliminar = document.createElement("button");
-    btnEliminar.textContent = "X";
-    btnEliminar.className = "btnEliminar";
+        const acciones = document.createElement("td");
+        const btnEliminar = document.createElement("button");
+        btnEliminar.textContent = "X";
+        btnEliminar.className = "btnEliminar";
 
-    btnEliminar.onclick = () => {
-      sensores.splice(index, 1);
-      cargarTabla();
-    };
+        btnEliminar.onclick = () => confirmarBorrado(sensor, index);
+        btnEliminar.onclick = () => {
+          console.log('Eliminar elemento con nserie:', sensor.nserie);
+          confirmarBorrado(sensor.nserie);
+      };
+        const btnModificar = document.createElement("button");
+        btnModificar.textContent = "Editar";
+        btnModificar.onclick = () => mostrarFormulario(sensor.nserie);
 
-    const btnModificar = document.createElement("button");
-    btnModificar.textContent = "Editar";
-    btnModificar.onclick = () => mostrarFormulario(sensor);
+        acciones.appendChild(btnEliminar);
+        acciones.appendChild(btnModificar);
 
-    acciones.appendChild(btnEliminar);
-    acciones.appendChild(btnModificar);
 
-    fila.appendChild(nombre);
-    fila.appendChild(descripcion);
-    fila.appendChild(numeroSerie);
-    fila.appendChild(estado);
-    fila.appendChild(prioridad);
-    fila.appendChild(acciones);
+        fila.appendChild(nombre);
+        fila.appendChild(descripcion);
+        fila.appendChild(numeroSerie);
+        fila.appendChild(estado);
+        fila.appendChild(prioridad);
+        fila.appendChild(acciones);
 
-    tablaSensores.appendChild(fila);
-  });
-}
-
-function mostrarFormulario(sensor) {
-  document.getElementById("formularioEdicion").style.display = "block";
-
-  document.getElementById("nombreEdicion").value = sensor.nombre;
-  document.getElementById("descripcionEdicion").value = sensor.descripcion;
-  document.getElementById("numSerieEdicion").value = sensor.numeroSerie;
-  document.getElementById("estadoEdicion").value = sensor.estado ? "true" : "false";
-  document.getElementById("prioridadEdicion").value = sensor.prioridad;
-
-  document.getElementById("guardarEdicion").onclick = () => guardarEdicion(sensor);
-}
-
-function guardarEdicion(sensor) {
-  sensor.nombre = document.getElementById("nombreEdicion").value;
-  sensor.descripcion = document.getElementById("descripcionEdicion").value;
-  sensor.numeroSerie = document.getElementById("numSerieEdicion").value;
-  sensor.estado = document.getElementById("estadoEdicion").value === "true";
-  sensor.prioridad = document.getElementById("prioridadEdicion").value;
-
-  cargarTabla();
-  document.getElementById("formularioEdicion").style.display = "none";
+        tablaSensores.appendChild(fila);
+      });
+    })
+    .catch((error) => {
+      console.error("Error al cargar los elementos:", error);
+      Swal.fire("Error", "Hubo un problema al cargar los elementos", "error");
+    });
 }
 
 function filtrarSensores() {
@@ -131,6 +84,262 @@ function filtrarSensores() {
     });
   }
 }
+
+function mostrarFormulario(nserie) {
+  fetch("ws/getElementByNSerie.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nserie }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        const sensorId = data.id;
+
+        fetch(`ws/getElements.php?id=${sensorId}`)
+          .then((response) => response.json())
+          .then((sensor) => {
+            document.getElementById("formularioEdicion").style.display =
+              "block";
+            document.getElementById("nombreEdicion").value = sensor.nombre;
+            document.getElementById("descripcionEdicion").value =
+              sensor.descripcion;
+            document.getElementById("numSerieEdicion").value = sensor.nserie;
+            document.getElementById("estadoEdicion").value = sensor.estado;
+            document.getElementById("prioridadEdicion").value =
+              sensor.prioridad;
+
+            document.getElementById("guardarEdicion").onclick = () =>
+              guardarEdicion(sensorId);
+          });
+      } else {
+        Swal.fire("Error", data.error || "Elemento no encontrado", "error");
+      }
+    })
+    .catch(() =>
+      Swal.fire("Error", "Hubo un problema al recuperar el elemento", "error")
+    );
+}
+
+function guardarEdicion(sensorId) {
+  const formData = new FormData();
+  formData.append("id", sensorId);
+  formData.append("nombre", document.getElementById("nombreEdicion").value);
+  formData.append(
+    "descripcion",
+    document.getElementById("descripcionEdicion").value
+  );
+  formData.append("nserie", document.getElementById("numSerieEdicion").value);
+  formData.append("estado", document.getElementById("estadoEdicion").value);
+  formData.append(
+    "prioridad",
+    document.getElementById("prioridadEdicion").value
+  );
+
+  fetch("ws/modifyElements.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        Swal.fire(
+          "Editado",
+          "El elemento ha sido editado correctamente",
+          "success"
+        );
+        cargarTabla();
+        document.getElementById("formularioEdicion").style.display = "none";
+      } else {
+        Swal.fire(
+          "Error",
+          data.error || "Hubo un problema al editar el elemento",
+          "error"
+        );
+      }
+    })
+    .catch(() =>
+      Swal.fire("Error", "Error al conectar con el servidor", "error")
+    );
+}
+
+function confirmarCreacion() {
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "Se creará un nuevo elemento.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, crear",
+    cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      crearElemento();
+    }
+  });
+}
+
+function confirmarEdicion(sensor) {
+  Swal.fire({
+    title: "¿Deseas editar este elemento?",
+    text: "Se aplicarán los cambios.",
+    icon: "info",
+    showCancelButton: true,
+    confirmButtonText: "Sí, editar",
+    cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      editarElemento(sensor);
+    }
+  });
+}
+
+function editarElemento(sensor) {
+  const formData = new FormData();
+  formData.append("id", sensor.id);
+  formData.append("nombre", document.getElementById("nombreEdicion").value);
+  formData.append(
+    "descripcion",
+    document.getElementById("descripcionEdicion").value
+  );
+  formData.append("numSerie", document.getElementById("numSerieEdicion").value);
+  formData.append("estado", document.getElementById("estadoEdicion").value);
+  formData.append(
+    "prioridad",
+    document.getElementById("prioridadEdicion").value
+  );
+
+  fetch("ws/modifyElements.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        Swal.fire(
+          "Editado",
+          "El elemento ha sido editado correctamente",
+          "success"
+        );
+        cargarTabla();
+        document.getElementById("formularioEdicion").style.display = "none";
+      } else {
+        Swal.fire("Error", "Hubo un problema al editar el elemento", "error");
+      }
+    })
+    .catch(() =>
+      Swal.fire("Error", "Hubo un problema al editar el elemento", "error")
+    );
+}
+
+function confirmarBorrado(nserie) {
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "Este elemento será eliminado.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, eliminar",
+    cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch("ws/getElementByNSerie.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nserie }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            const sensorId = data.id;
+
+            fetch("ws/deleteElement.php", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id: sensorId }),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.success) {
+                  Swal.fire(
+                    "Eliminado",
+                    "El elemento ha sido eliminado correctamente",
+                    "success"
+                  );
+                  cargarTabla();
+                } else {
+                  Swal.fire(
+                    "Error",
+                    data.error || "Hubo un problema al eliminar el elemento",
+                    "error"
+                  );
+                }
+              });
+          } else {
+            Swal.fire("Error", data.error || "Elemento no encontrado", "error");
+          }
+        })
+        .catch(() =>
+          Swal.fire("Error", "Error al conectar con el servidor", "error")
+        );
+    }
+  });
+}
+
+async function cargarElementos() {
+  try {
+    let response = await fetch("ws/getElements.php");
+    let data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error("Error al cargar elementos:", error);
+  }
+}
+
+async function borrarElemento() {
+  try {
+    let response = await fetch("ws/deleteElement.php", {
+      method: "POST",
+      body: JSON.stringify({ id: 1 }),
+      headers: { "Content-Type": "application/json" },
+    });
+    let result = await response.json();
+    console.log(result);
+  } catch (error) {
+    console.error("Error al borrar elemento:", error);
+  }
+}
+
+function crearElemento() {
+  const formData = new FormData(document.getElementById("formSensor"));
+
+  const estado = document.querySelector('input[name="estado"]:checked');
+  const prioridad = document.querySelector('input[name="prioridad"]:checked');
+
+  if (estado) {
+      formData.append('estado', estado.value);
+  }
+  if (prioridad) {
+      formData.append('prioridad', prioridad.value);
+  }
+
+  fetch('ws/createElement.php', {
+      method: 'POST',
+      body: formData
+  })
+  .then(response => response.json()) 
+  .then(data => {
+      if (data.success) {
+          Swal.fire("Creado", "El elemento ha sido creado correctamente", "success");
+          document.getElementById("formSensor").reset(); 
+      } else {
+          Swal.fire("Error", data.error || "Hubo un problema al crear el elemento", "error");
+      }
+  })
+  .catch(error => {
+      Swal.fire("Error", "Hubo un problema al conectar con el servidor", "error");
+  });
+}
+
+
 
 window.onload = () => {
   cargarTabla();
